@@ -2,23 +2,22 @@ package com.cos.web.controller;
 
 import com.cos.domain.Subscriber;
 import com.cos.service.SubscriberService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
  * Created by TQ3A016 on 2/26/2015.
  */
 @Controller
-@RequestMapping
 public class SubscriberController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CosAccountController.class);
     @Autowired
     private SubscriberService subscriberService;
 
@@ -31,9 +30,9 @@ public class SubscriberController {
     public String login(HttpSession httpSession, Model model, Subscriber subscriber) {
         if (subscriberService.authenticate(subscriber)) {
             httpSession.setAttribute("user", subscriber);
-            return "showUser";
+            return "redirect:listCos";
         }
-        model.addAttribute("err", "bad user");
+        model.addAttribute("err", "bad user or password");
         return "login";
     }
 

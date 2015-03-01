@@ -12,10 +12,22 @@ public class CosAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+    @Column(name = "host")
     private String host;
+    @Column(name = "access_key")
     private String accessKey;
+    @Column(name = "secret_key")
     private String secretKey;
+    @Column(name = "subscriber_name")
     private String subscriberName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getHost() {
         return host;
@@ -24,7 +36,6 @@ public class CosAccount {
     public void setHost(String host) {
         this.host = host;
     }
-
 
     public String getSubscriberName() {
         return subscriberName;

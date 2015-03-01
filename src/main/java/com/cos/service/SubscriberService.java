@@ -16,7 +16,7 @@ public class SubscriberService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SubscriberService.class);
 
     @Autowired
-    public SubscriberRepository subscriberRepository;
+    private SubscriberRepository subscriberRepository;
 
     public boolean authenticate(Subscriber subscriber) {
         Subscriber subs = subscriberRepository.findOne(subscriber.getName());
