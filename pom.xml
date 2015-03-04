@@ -143,11 +143,6 @@
             <artifactId>aws-java-sdk-core</artifactId>
             <version>1.9.18</version>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.2</version>
-        </dependency>
 
         <!-- slf4j -->
         <dependency>
@@ -162,6 +157,17 @@
             <version>1.7.6</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>ch.qos.logback</groupId>-->
+            <!--<artifactId>logback-classic</artifactId>-->
+            <!--<version>1.1.2</version>-->
+        <!--</dependency>-->
+
         <!-- junit -->
         <dependency>
             <groupId>junit</groupId>

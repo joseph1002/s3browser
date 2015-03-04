@@ -17,15 +17,25 @@
         <td>host</td>
         <td>access_key</td>
         <td>secret_key</td>
+        <td>connect</td>
     </tr>
     　　 <c:forEach var="cosAccount" items="${cosList}">
     　　<tr>
     　　<td>${cosAccount.host}</td>
     　　<td>${cosAccount.accessKey}</td>
-    <td>${cosAccount.secretKey}</td>
+    　　<td>${cosAccount.secretKey}</td>
+    <td>
+        <form id="connect" method="post" action="connectCos">
+            <input type="hidden" value="${cosAccount.host}" name="host">
+            <input type="hidden" value="${cosAccount.accessKey}" name="accessKey"/><br/>
+            <input type="hidden" value="${cosAccount.secretKey}" name="secretKey"/><br/>
+            <input type="submit" value="connect"/><br/>
+        </form>
+    </td>
     　　</tr>
     　　</c:forEach>
     　　
 </table>
+<a href="addCos">add an cos account</a>
 </body>
 </html>
