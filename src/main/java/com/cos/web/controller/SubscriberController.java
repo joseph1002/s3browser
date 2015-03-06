@@ -29,8 +29,8 @@ public class SubscriberController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(HttpSession httpSession, Model model, Subscriber subscriber) {
         if (subscriberService.authenticate(subscriber)) {
-            httpSession.setAttribute("user", subscriber);
-            return "redirect:listCos";
+            httpSession.setAttribute("subscriber", subscriber);
+            return "showUser";
         }
         model.addAttribute("err", "bad user or password");
         return "login";
@@ -44,7 +44,7 @@ public class SubscriberController {
     @RequestMapping(value="/register", method = RequestMethod.POST)
     public String register(HttpSession httpSession, Subscriber subscriber) {
         subscriberService.register(subscriber);
-        httpSession.setAttribute("user", subscriber);
+        httpSession.setAttribute("subscriber", subscriber);
         return "showUser";
     }
 

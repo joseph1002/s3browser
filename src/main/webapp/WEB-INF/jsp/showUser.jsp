@@ -5,10 +5,10 @@
 </head>
 <body>
 Info<br>
-User: ${user.name}<br>
-Pass：${user.password}<br>
+User: ${subscriber.name}<br>
+Pass：${subscriber.password}<br>
 
-<a href="listCos">list all cos accounts</a>
-<a href="addCos">add an cos account</a>
+<a href="cos/admin/accounts">list all cos accounts</a>
+<a href="cos/admin/addCos">add an cos account</a>
 </body>
 </html>

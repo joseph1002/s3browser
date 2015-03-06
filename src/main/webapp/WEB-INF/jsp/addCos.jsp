@@ -12,11 +12,11 @@
 </head>
 <body>
 <form id="addCos" method="post" action="addCos">
-    <input type="hidden" value ="${user.name}" name="subscriberName">
+    <input type="hidden" value ="${subscriber.name}" name="subscriberName">
     host: <input type="text" name="host"/><br/>
     access_key: <input type="text" name="accessKey"/><br/>
     secret_key: <input type="text" name="secretKey"/><br/>
-    <input type="submit" value="addCos"/><br/>
+    <input type="submit" value="add"/><br/>
 </form>
 </body>
 </html>

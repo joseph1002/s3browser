@@ -19,19 +19,22 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
+@RequestMapping(value = "/cos/admin")
 public class CosAccountController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CosAccountController.class);
     @Autowired
     private CosAccountService cosAccountService;
 
-    @RequestMapping(value = "/listCos", method = RequestMethod.GET)
+    @RequestMapping(value = "/accounts", method = RequestMethod.GET)
     public String listAccount(HttpSession httpSession, Model model) {
-        Subscriber subscriber = (Subscriber)httpSession.getAttribute("user");
+        Subscriber subscriber = (Subscriber)httpSession.getAttribute("subscriber");
         if (subscriber == null) {
             model.addAttribute("err", "user should log in first");
+            return "redirect:/login";
         }
+
         List<CosAccount> list = cosAccountService.list(subscriber.getName());
-        model.addAttribute("cosList", list);
+        model.addAttribute("cosAccounts", list);
         return "listCos";
     }
 
@@ -41,10 +44,9 @@ public class CosAccountController {
     }
 
     @RequestMapping(value = "/addCos", method = RequestMethod.POST)
-    public String add(HttpSession httpSession, CosAccount cosAccount) {
+    public String add(CosAccount cosAccount) {
         cosAccountService.add(cosAccount);
-        httpSession.setAttribute("cos", cosAccount);
-        return "redirect:listCos";
+        return "redirect:accounts";
     }
 
 }

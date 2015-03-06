@@ -44,7 +44,7 @@ public class LoginFilter implements Filter {
         // intercept
         // getSession(true) is required, otherwise there will null pointer at next line.
         HttpSession session = httpRequest.getSession(true);
-        if (session.getAttribute("user") == null) {
+        if (session.getAttribute("subscriber") == null) {
             logger.debug("user should login first. ");
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         } else {
