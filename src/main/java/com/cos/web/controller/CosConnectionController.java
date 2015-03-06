@@ -24,11 +24,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by TQ3A016 on 3/4/2015.
+ * Created by Joseph on 3/4/2015.
  */
 @Controller
 @RequestMapping(value = "/cos")
@@ -56,19 +57,16 @@ public class CosConnectionController {
         return "listBuckets";
     }
 
-    @RequestMapping(value = "/objects", method = RequestMethod.GET)
-    public String objects(HttpSession httpSession, Model model, String bucketName) {
+    @RequestMapping(value = "/bucket/{bucketName}/objects", method = RequestMethod.GET)
+    public String objects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        ObjectListing objects = conn.listObjects(bucketName);
+        ObjectListing objectListing = conn.listObjects(bucketName);
+        List<S3ObjectSummary> objectSummary = new LinkedList<S3ObjectSummary>();
         do {
-            for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-                System.out.println(objectSummary.getKey() + "\t" +
-                        objectSummary.getSize() + "\t" +
-                        StringUtils.fromDate(objectSummary.getLastModified()));
-            }
-            objects = conn.listNextBatchOfObjects(objects);
-        } while (objects.isTruncated());
-        model.addAttribute("objects", objects);
+            objectSummary.addAll(objectListing.getObjectSummaries());
+            objectListing = conn.listNextBatchOfObjects(objectListing);
+        } while (objectListing.isTruncated());
+        model.addAttribute("objects", objectSummary);
         return "listObjects";
     }
 
@@ -85,7 +83,6 @@ public class CosConnectionController {
         public void setId(int id) {
             this.id = id;
         }
-
 
         public String getRealName() {
             return realName;
@@ -104,28 +101,8 @@ public class CosConnectionController {
         }
     }
 
-    @RequestMapping(value = "/oneFileUpload", method = RequestMethod.POST)
-    public String handleFormUpload(HttpServletRequest request, @RequestParam("name") String name, @RequestParam("file") MultipartFile file) {
-        String dir = request.getSession().getServletContext().getRealPath("/") + "upload";
-        List<UploadFile> uploadFiles = new ArrayList<UploadFile>();
-        if (!file.isEmpty()) {
-            try {
-                String realName = this.copyFile(file.getInputStream(), dir, file.getOriginalFilename());
-                UploadFile u = new UploadFile();
-                u.setRealName(realName);
-                u.setName(name);
-                uploadFiles.add(u);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        request.setAttribute("uploadFiles", uploadFiles);
-        return "success";
-    }
-
-    @RequestMapping(value = "/multipartFileUpload", method = RequestMethod.POST)
-    public String upload2(MultipartHttpServletRequest request, @RequestParam("name") String name // 页面上的控件值
-    ) {
+    @RequestMapping(value = "/bucket/{bucketName}/object", method = RequestMethod.POST)
+    public String uploadObjects(MultipartHttpServletRequest request, @PathVariable(value="bucketName") String bucketName) {
         List<UploadFile> uploadFiles = new ArrayList<UploadFile>();
         List<MultipartFile> files = request.getFiles("file");
         String dir = request.getSession().getServletContext().getRealPath("/") + "upload";
@@ -147,7 +124,7 @@ public class CosConnectionController {
     }
 
     @RequestMapping("/download/{realName}/{name}")
-    public void download(HttpServletResponse response, HttpServletRequest request, @PathVariable String realName, @PathVariable String name) {
+    public void downloadObject(HttpServletResponse response, HttpServletRequest request, @PathVariable String realName, @PathVariable String name) {
         OutputStream os = null;
         response.reset();
         realName = request.getSession().getServletContext().getRealPath("/") + "upload" + File.separator + realName;
