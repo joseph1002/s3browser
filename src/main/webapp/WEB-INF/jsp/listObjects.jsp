@@ -29,15 +29,15 @@
 <table>
     <tr>
         <td>File</td>
-        <%--<td>eTag</td>--%>
+        <td>eTag</td>
         <td>size</td>
         <td>owner</td>
         <td>last modified</td>
     </tr>
 <c:forEach var="object" items="${objects}">
 <tr>
-<td>${object.key}</td>
-<%--<td>${object.eTag}</td>--%>
+<td><a href="object/${object.key}/">${object.key}</a></td>
+<td>${object.ETag}</td>
 <td>${object.size}</td>
 <td>${object.owner}</td>
 <td>${object.lastModified}</td>
@@ -46,9 +46,13 @@
 </table>
 <%
     List<S3ObjectSummary> objectList = (List<S3ObjectSummary>)request.getAttribute("objects");
-    String bucketName = objectList.get(0).getBucketName();
-    String eTag = objectList.get(0).getETag();
-    System.out.print("bucketName:" + bucketName + " eTag:" + eTag + "%n");
+    if (objectList != null) {
+        for (S3ObjectSummary object: objectList) {
+            String bucketName = object.getBucketName();
+            String eTag = object.getETag();
+            System.out.print("bucketName:" + bucketName + " eTag:" + eTag + "%n");
+        }
+    }
 %>
 <form method="POST" action=object enctype="multipart/form-data">
     <%--<input type="text" name="name" /><br>--%>

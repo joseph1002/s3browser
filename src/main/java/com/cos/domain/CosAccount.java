@@ -4,7 +4,7 @@ package com.cos.domain;
 import javax.persistence.*;
 
 /**
- * Created by TQ3A016 on 2/17/2015.
+ * Created by Joseph on 2/17/2015.
  */
 @Entity
 @Table(name = "COS_ACCOUNT")
@@ -20,6 +20,8 @@ public class CosAccount {
     private String secretKey;
     @Column(name = "subscriber_name")
     private String subscriberName;
+    @Column(name = "protocol")
+    private String protocol;
 
     public Long getId() {
         return id;
@@ -37,14 +39,6 @@ public class CosAccount {
         this.host = host;
     }
 
-    public String getSubscriberName() {
-        return subscriberName;
-    }
-
-    public void setSubscriberName(String subscriberName) {
-        this.subscriberName = subscriberName;
-    }
-
     public String getAccessKey() {
         return accessKey;
     }
@@ -60,4 +54,21 @@ public class CosAccount {
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
+
+    public String getSubscriberName() {
+        return subscriberName;
+    }
+
+    public void setSubscriberName(String subscriberName) {
+        this.subscriberName = subscriberName;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
 }

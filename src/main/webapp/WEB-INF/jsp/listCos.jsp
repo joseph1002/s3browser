@@ -17,18 +17,21 @@
         <td>host</td>
         <td>access_key</td>
         <td>secret_key</td>
+        <td>protocol</td>
         <td>connect</td>
     </tr>
     　　 <c:forEach var="cosAccount" items="${cosAccounts}">
-    　　<tr>
-    　　<td>${cosAccount.host}</td>
-    　　<td>${cosAccount.accessKey}</td>
-    　　<td>${cosAccount.secretKey}</td>
+        <tr>
+        <td>${cosAccount.host}</td>
+        <td>${cosAccount.accessKey}</td>
+        <td>${cosAccount.secretKey}</td>
+        <td>${cosAccount.protocol}</td>
     <td>
         <form id="connect" method="post" action="../entry">
             <input type="hidden" value="${cosAccount.host}" name="host">
             <input type="hidden" value="${cosAccount.accessKey}" name="accessKey"/><br/>
             <input type="hidden" value="${cosAccount.secretKey}" name="secretKey"/><br/>
+            <input type="hidden" value="${cosAccount.protocol}" name="protocol"/><br/>
             <input type="submit" value="connect"/><br/>
         </form>
     </td>

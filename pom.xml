@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <springframework.version>4.1.5.RELEASE</springframework.version>
+        <amazonaws.version>1.8.11</amazonaws.version>
     </properties>
 
     <dependencies>
@@ -136,12 +137,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.9.18</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-core</artifactId>
-            <version>1.9.18</version>
+            <version>${amazonaws.version}</version>
         </dependency>
 
         <!-- slf4j -->
