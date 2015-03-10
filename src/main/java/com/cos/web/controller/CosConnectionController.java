@@ -41,15 +41,29 @@ public class CosConnectionController {
     }
 
     @RequestMapping(value = "/buckets", method = RequestMethod.GET)
-    public String buckets(HttpSession httpSession, Model model) {
+    public String listBuckets(HttpSession httpSession, Model model) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
         List<Bucket> bucketList = cosConnectionService.listBuckets(conn);
         model.addAttribute("buckets", bucketList);
         return "listBuckets";
     }
 
+    @RequestMapping(value = "/bucket/{bucketName}", method = RequestMethod.POST)
+    public String createBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
+        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        cosConnectionService.createBucket(conn, bucketName);
+        return "redirect:buckets";
+    }
+
+    @RequestMapping(value = "/bucket/{bucketName}", method = RequestMethod.DELETE)
+    public String deleteBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
+        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        cosConnectionService.deleteBucket(conn, bucketName);
+        return "redirect:buckets";
+    }
+
     @RequestMapping(value = "/bucket/{bucketName}/objects", method = RequestMethod.GET)
-    public String objects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
+    public String listObjects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
         List<S3ObjectSummary> objectSummaryList = cosConnectionService.listObjects(conn, bucketName);
         model.addAttribute("objects", objectSummaryList);
@@ -105,4 +119,9 @@ public class CosConnectionController {
         }
     }
 
+    @RequestMapping(value = "/bucket/{bucketName}/object/{objectName}/acl/{accessControl}", method = RequestMethod.PUT)
+    public void changeObjectAcl(HttpSession httpSession, @PathVariable String bucketName, @PathVariable String objectName, @PathVariable String accessControl) {
+        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        cosConnectionService.changeObjectAcl(conn, bucketName, objectName, accessControl);
+    }
 }

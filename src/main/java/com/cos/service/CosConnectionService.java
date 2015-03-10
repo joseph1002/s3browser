@@ -32,10 +32,7 @@ public class CosConnectionService {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         ClientConfiguration clientConfig = new ClientConfiguration();
 
-        Protocol proto = Protocol.HTTP;
-        if (protocol == "HTTPS") {
-            proto = Protocol.HTTPS;
-        }
+        Protocol proto = Protocol.valueOf(protocol.toUpperCase());
         clientConfig.setProtocol(proto);
 
         AmazonS3 conn = new AmazonS3Client(credentials, clientConfig);
@@ -51,6 +48,14 @@ public class CosConnectionService {
                     StringUtils.fromDate(bucket.getCreationDate()));
         }
         return bucketList;
+    }
+
+    public void createBucket(AmazonS3 conn, String bucketName) {
+        conn.createBucket(bucketName);
+    }
+
+    public void deleteBucket(AmazonS3 conn, String bucketName) {
+        conn.deleteBucket(bucketName);
     }
 
     public List<S3ObjectSummary> listObjects(AmazonS3 conn, String bucketName) {
@@ -94,5 +99,10 @@ public class CosConnectionService {
         conn.getObject(new GetObjectRequest(bucketName, objectName), file);
         os.write(FileUtils.readFileToByteArray(file));
         os.flush();
+    }
+
+    public void changeObjectAcl(AmazonS3 conn, String bucketName, String objectName, String accessControl) {
+        CannedAccessControlList acl = CannedAccessControlList.valueOf(accessControl);
+        conn.setObjectAcl(bucketName, objectName, acl);
     }
 }

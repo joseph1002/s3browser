@@ -12,6 +12,8 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
+import com.cos.util.crypto.AESCrypto;
+import com.cos.util.crypto.MD5Crypto;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by TQ3A016 on 2/15/2015.
+ * Created by Joseph on 2/15/2015.
  */
 // reference: ceph-docs/ceph.com/docs/master/radosgw/s3/bucketops/default.htm
 public class BrowserTest {
@@ -120,5 +122,24 @@ public class BrowserTest {
                 new GetObjectRequest(bucket.getName(), "perl_poetry.pdf"),
                 new File("/home/larry/documents/perl_poetry.pdf")
         );
+    }
+
+    @Test
+    public void testAESCryption() {
+        String seed = "wallestar";
+        String password = "123456";
+        byte[] encryptResult = AESCrypto.encrypt(password, seed);
+        String encryptResultStr = AESCrypto.byteArrayToHexString(encryptResult);
+        byte[] decryptFrom = AESCrypto.hexStringToByteArray(encryptResultStr);
+        byte[] decryptResult = AESCrypto.decrypt(decryptFrom, seed);
+        String decrytPassword = new String(decryptResult);
+        LOGGER.info("password:{}, after encrypt:{}, after decrypt:{}", password, encryptResultStr, new String(decryptResult));
+        Assert.assertArrayEquals(encryptResult, decryptFrom);
+        Assert.assertEquals(password, decrytPassword);
+    }
+
+    @Test
+    public void testMD5Cryption() {
+        LOGGER.info("md5 admin={}, ,length={}", MD5Crypto.MD5Encode("123456"), MD5Crypto.MD5Encode("123456").length());
     }
 }
