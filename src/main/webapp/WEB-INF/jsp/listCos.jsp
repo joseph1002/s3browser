@@ -12,6 +12,18 @@
     <title>List Cos Account</title>
 </head>
 <body>
+<style type="text/css">
+    table
+    {
+        border-collapse: collapse;
+        border: none;
+        width: 200px;
+    }
+    td
+    {
+        border: solid #000 1px;
+    }
+</style>
 <table>
     <tr>
         <td>host</td>
@@ -38,6 +50,6 @@
     　　</tr>
     　　</c:forEach>
 </table>
-<a href="addCos">add an cos account</a>
+<a href="account">add an cos account</a>
 </body>
 </html>

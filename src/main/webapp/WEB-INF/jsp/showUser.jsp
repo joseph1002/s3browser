@@ -9,6 +9,6 @@ User: ${subscriber.name}<br>
 Pass：${subscriber.password}<br>
 
 <a href="cos/admin/accounts">list all cos accounts</a>
-<a href="cos/admin/addCos">add an cos account</a>
+<a href="cos/admin/account">add an cos account</a>
 </body>
 </html>

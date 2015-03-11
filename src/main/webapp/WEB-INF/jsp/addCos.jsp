@@ -11,11 +11,13 @@
     <title>add cos account</title>
 </head>
 <body>
-<form id="addCos" method="post" action="addCos">
+<form id="addCos" method="post" action="account">
     <input type="hidden" value ="${subscriber.name}" name="subscriberName">
     host: <input type="text" name="host"/><br/>
     access_key: <input type="text" name="accessKey"/><br/>
     secret_key: <input type="text" name="secretKey"/><br/>
+    <input type="radio" value="HTTP" name="protocol" checked>HTTP
+    <input type="radio" value="HTTPS" name="protocol">HTTPS
     <input type="submit" value="add"/><br/>
 </form>
 </body>
