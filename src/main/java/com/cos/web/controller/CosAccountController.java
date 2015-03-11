@@ -38,12 +38,12 @@ public class CosAccountController {
         return "listCos";
     }
 
-    @RequestMapping(value = "/addCos", method = RequestMethod.GET)
+    @RequestMapping(value = "/account", method = RequestMethod.GET)
     public String toAdd() {
         return "addCos";
     }
 
-    @RequestMapping(value = "/addCos", method = RequestMethod.POST)
+    @RequestMapping(value = "/account", method = RequestMethod.POST)
     public String add(CosAccount cosAccount) {
         cosAccountService.add(cosAccount);
         return "redirect:accounts";

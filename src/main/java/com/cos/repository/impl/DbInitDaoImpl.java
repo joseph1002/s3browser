@@ -27,7 +27,7 @@ public class DbInitDaoImpl implements IDbInitDao {
         if (rs.getInt("TOTAL") == 0) {
             stmt.execute("CREATE TABLE COS_ACCOUNT(id INT(8) NOT NULL AUTO_INCREMENT, PRIMARY KEY(id), " +
                     "SUBSCRIBER_NAME VARCHAR(255), HOST VARCHAR(32), ACCESS_KEY VARCHAR(255), " +
-                    "SECRET_KEY VARCHAR(255), PROTOCOL VARCHAR(6))");
+                    "SECRET_KEY VARCHAR(255))");
         }
     }
 

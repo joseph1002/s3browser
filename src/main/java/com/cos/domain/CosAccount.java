@@ -20,8 +20,6 @@ public class CosAccount {
     private String secretKey;
     @Column(name = "subscriber_name")
     private String subscriberName;
-    @Column(name = "protocol")
-    private String protocol;
 
     public Long getId() {
         return id;
@@ -61,14 +59,6 @@ public class CosAccount {
 
     public void setSubscriberName(String subscriberName) {
         this.subscriberName = subscriberName;
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
 }

@@ -12,12 +12,23 @@
     <title>List Cos Account</title>
 </head>
 <body>
+<style type="text/css">
+    table
+    {
+        border-collapse: collapse;
+        border: none;
+        width: 200px;
+    }
+    td
+    {
+        border: solid #000 1px;
+    }
+</style>
 <table>
     <tr>
         <td>host</td>
         <td>access_key</td>
         <td>secret_key</td>
-        <td>protocol</td>
         <td>connect</td>
     </tr>
     　　 <c:forEach var="cosAccount" items="${cosAccounts}">
@@ -25,19 +36,19 @@
         <td>${cosAccount.host}</td>
         <td>${cosAccount.accessKey}</td>
         <td>${cosAccount.secretKey}</td>
-        <td>${cosAccount.protocol}</td>
     <td>
         <form id="connect" method="post" action="../entry">
             <input type="hidden" value="${cosAccount.host}" name="host">
             <input type="hidden" value="${cosAccount.accessKey}" name="accessKey"/><br/>
             <input type="hidden" value="${cosAccount.secretKey}" name="secretKey"/><br/>
-            <input type="hidden" value="${cosAccount.protocol}" name="protocol"/><br/>
+            <input type="radio" value="HTTP" name="protocol" checked>HTTP
+            <input type="radio" value="HTTPS" name="protocol">HTTPS
             <input type="submit" value="connect"/><br/>
         </form>
     </td>
     　　</tr>
     　　</c:forEach>
 </table>
-<a href="addCos">add an cos account</a>
+<a href="account">add an cos account</a>
 </body>
 </html>

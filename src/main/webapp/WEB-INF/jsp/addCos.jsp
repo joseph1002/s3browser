@@ -11,7 +11,7 @@
     <title>add cos account</title>
 </head>
 <body>
-<form id="addCos" method="post" action="addCos">
+<form id="addCos" method="post" action="account">
     <input type="hidden" value ="${subscriber.name}" name="subscriberName">
     host: <input type="text" name="host"/><br/>
     access_key: <input type="text" name="accessKey"/><br/>
