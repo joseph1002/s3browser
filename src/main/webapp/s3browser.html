@@ -5,9 +5,53 @@
     <title>S3 Browser</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap.css">
     <!--<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.2/css/bootstrap.min.css">-->
-    <link rel="stylesheet" href="../static/css/s3browser.css">
+    <link rel="stylesheet" href="static/css/s3browser.css">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="static/js/jquery-2.1.3.min.js"></script>
+    <!--<script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>-->
+
+    <script type="text/javascript">
+        function connectServer() {
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url:"/cos/entry",
+                data:{
+                    "host":$("#host").val(),
+                    "accessKey":$("#accessKey").val(),
+                    "secretKey":$("#secretKey").val(),
+                    "protocol":$("#protocol").val()
+                },
+//                data:$('#connectForm').serialize(),
+                async: false,
+                error: function(request) {
+                    alert("Connection error");
+                },
+                success: function(data) {
+                    console.log(data);
+                    getBuckets();
+                }
+            });
+        }
+
+        function getBuckets() {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url:"/cos/buckets",
+                async: false,
+                error: function(request) {
+                    alert("Get error");
+                },
+                success: function(data) {
+//                    console.log(JSON.stringify(data));
+                    console.log(data);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 <nav class="navbar navbar-fixed-top navbar-inverse container-fluid" role="navigation">
@@ -95,29 +139,28 @@
 </nav>
 <div class="container-fluid">
     <div class="row">
-        <form class="form-inline">
+        <div class="form-inline" id="connectForm">
             <div class="form-group">
                 <label for="host">host:</label>
-                <input type="text" class="form-control" id="host" placeholder="172.24.133.103">
+                <input type="text" class="form-control" id="host" name="host" placeholder="172.24.133.103">
             </div>
             <div class="form-group">
                 <label for="accessKey">access_key:</label>
-                <input type="text" class="form-control" id="accessKey" placeholder="LXZDUBGMBRP1AGUTBSP0">
+                <input type="text" class="form-control" id="accessKey" name="accessKey" placeholder="LXZDUBGMBRP1AGUTBSP0">
             </div>
             <div class="form-group">
-                <label for="privateKey">private_key:</label>
-                <input type="text" class="form-control" id="privateKey"
-                       placeholder="uXH34a0Kogb7bT87rn6x839UKhb3xJWFADP09Su3">
+                <label for="secretKey">private_key:</label>
+                <input type="text" class="form-control" id="secretKey" name="secretKey" placeholder="uXH34a0Kogb7bT87rn6x839UKhb3xJWFADP09Su3">
             </div>
             <div class="form-group">
                 <label for="protocol">protocol:</label>
-                <select class="form-control input-group-sm" id="protocol">
+                <select class="form-control input-group-sm" id="protocol" name="protocol">
                     <option value="HTTP">HTTP</option>
                     <option value="HTTPS">HTTPS</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Connect</button>
-        </form>
+            <button onclick="connectServer()">Connect</button>
+        </div>
     </div>
 </div>
 
@@ -166,12 +209,8 @@
     </div>
 </div>
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="../static/js/jquery-2.1.3.min.js"></script>
-<!--<script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>-->
-
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="../static/bootstrap/js/bootstrap.min.js"></script>
+<script src="static/bootstrap/js/bootstrap.js"></script>
 <!--<script src="http://cdn.bootcss.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>-->
 </body>
 </html>

@@ -52,21 +52,21 @@
     </servlet-mapping>
 
     <!-- web.xml中四种配置参数的执行顺序是:context-param  Listener Filter Servlet -->
-    <filter>
-        <filter-name>loginFilter</filter-name>
-        <filter-class>com.cos.web.filter.LoginFilter</filter-class>
-        <init-param>
-            <param-name>excludedUrls</param-name>
-            <param-value>/login,/register</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>loginFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <!--<filter>-->
+        <!--<filter-name>loginFilter</filter-name>-->
+        <!--<filter-class>com.cos.web.filter.LoginFilter</filter-class>-->
+        <!--<init-param>-->
+            <!--<param-name>excludedUrls</param-name>-->
+            <!--<param-value>/login,/register</param-value>-->
+        <!--</init-param>-->
+    <!--</filter>-->
+    <!--<filter-mapping>-->
+        <!--<filter-name>loginFilter</filter-name>-->
+        <!--<url-pattern>/*</url-pattern>-->
+    <!--</filter-mapping>-->
 
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>s3browser.html</welcome-file>
     </welcome-file-list>
 
 </web-app>

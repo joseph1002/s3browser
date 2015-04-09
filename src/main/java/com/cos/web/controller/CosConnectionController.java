@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -20,7 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Joseph on 3/4/2015.
@@ -29,23 +32,31 @@ import java.util.List;
 @Scope("prototype")
 @RequestMapping(value = "/cos")
 public class CosConnectionController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CosConnectionController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CosConnectionController.class);
     @Autowired
     CosConnectionService cosConnectionService;
 
     @RequestMapping(value = "/entry", method = RequestMethod.POST)
-    public String connect(HttpSession httpSession, String host, String accessKey, String secretKey, String protocol) {
+    @ResponseBody
+    public Object connect(HttpSession httpSession, String host, String accessKey, String secretKey, String protocol) {
         AmazonS3 conn = cosConnectionService.connect(host, accessKey, secretKey, protocol);
         httpSession.setAttribute("connection", conn);
-        return "redirect:buckets";
+
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        modelMap.put("accountOwner", conn.getS3AccountOwner());
+        return modelMap;
     }
 
     @RequestMapping(value = "/buckets", method = RequestMethod.GET)
-    public String listBuckets(HttpSession httpSession, Model model) {
+    @ResponseBody
+    public Object listBuckets(HttpSession httpSession, Model model) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        List<Bucket> bucketList = cosConnectionService.listBuckets(conn);
-        model.addAttribute("buckets", bucketList);
-        return "listBuckets";
+//        List<Bucket> bucketList = cosConnectionService.listBuckets(conn);
+//        model.addAttribute("buckets", bucketList);
+//        return "listBuckets";
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String json = objectMapper.writeValueAsString(bucketList);
+        return cosConnectionService.listBuckets(conn);
     }
 
     @RequestMapping(value = "/bucket/{bucketName}", method = RequestMethod.POST)

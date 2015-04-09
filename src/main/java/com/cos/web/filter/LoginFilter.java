@@ -49,7 +49,6 @@ public class LoginFilter implements Filter {
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         } else {
             chain.doFilter(request, response);
-            return;
         }
     }
 
