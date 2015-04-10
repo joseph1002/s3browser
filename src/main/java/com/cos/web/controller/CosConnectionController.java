@@ -74,11 +74,13 @@ public class CosConnectionController {
     }
 
     @RequestMapping(value = "/bucket/{bucketName}/objects", method = RequestMethod.GET)
-    public String listObjects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
+    @ResponseBody
+    public Object listObjects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        List<S3ObjectSummary> objectSummaryList = cosConnectionService.listObjects(conn, bucketName);
-        model.addAttribute("objects", objectSummaryList);
-        return "listObjects";
+//        List<S3ObjectSummary> objectSummaryList = cosConnectionService.listObjects(conn, bucketName);
+//        model.addAttribute("objects", objectSummaryList);
+//        return "listObjects";
+        return cosConnectionService.listObjects(conn, bucketName);
     }
 
     @RequestMapping(value = "/bucket/{bucketName}/object", method = RequestMethod.POST)
