@@ -1,7 +1,6 @@
 package com.cos.web.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
 import com.cos.domain.Subscriber;
 import com.cos.service.CosConnectionService;
 import org.slf4j.Logger;
@@ -60,17 +59,21 @@ public class CosConnectionController {
     }
 
     @RequestMapping(value = "/bucket/{bucketName}", method = RequestMethod.POST)
-    public String createBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
+    @ResponseBody
+    public Object createBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        cosConnectionService.createBucket(conn, bucketName);
-        return "redirect:buckets";
+        return cosConnectionService.createBucket(conn, bucketName);
     }
 
     @RequestMapping(value = "/bucket/{bucketName}", method = RequestMethod.DELETE)
-    public String deleteBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
+    @ResponseBody
+    public Object deleteBucket(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
         cosConnectionService.deleteBucket(conn, bucketName);
-        return "redirect:buckets";
+
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        modelMap.put("deletedBucket", bucketName);
+        return modelMap;
     }
 
     @RequestMapping(value = "/bucket/{bucketName}/objects", method = RequestMethod.GET)
@@ -106,9 +109,13 @@ public class CosConnectionController {
     @RequestMapping("/bucket/{bucketName}/object/{objectName}")
     public void downloadObject(HttpSession httpSession, HttpServletResponse response, HttpServletRequest request, @PathVariable String bucketName, @PathVariable String objectName) throws UnsupportedEncodingException {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        String lastDir = "anonymous";
         Subscriber subscriber = (Subscriber)httpSession.getAttribute("subscriber");
+        if (subscriber != null) {
+            lastDir = subscriber.getName();
+        }
         String dir = request.getSession().getServletContext().getRealPath("/") + File.separator
-                + "downloads" + File.separator + subscriber.getName();
+                + "downloads" + File.separator + lastDir;
 
         OutputStream os = null;
         response.reset();

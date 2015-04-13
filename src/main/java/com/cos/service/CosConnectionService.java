@@ -50,8 +50,8 @@ public class CosConnectionService {
         return bucketList;
     }
 
-    public void createBucket(AmazonS3 conn, String bucketName) {
-        conn.createBucket(bucketName);
+    public Bucket createBucket(AmazonS3 conn, String bucketName) {
+        return conn.createBucket(bucketName);
     }
 
     public void deleteBucket(AmazonS3 conn, String bucketName) {
