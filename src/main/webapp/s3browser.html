@@ -9,215 +9,10 @@
     <!--<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.2/css/bootstrap.min.css">-->
     <link rel="stylesheet" href="static/css/s3browser.css">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="static/js/jquery-2.1.3.min.js"></script>
+    <script src="static/js/jquery-2.1.3.js"></script>
     <!--<script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>-->
-
-    <script type="text/javascript">
-        Date.prototype.Format = function (fmt) { //author: meizz
-            var o = {
-                "M+": this.getMonth() + 1, //月份
-                "d+": this.getDate(), //日
-                "h+": this.getHours(), //小时
-                "m+": this.getMinutes(), //分
-                "s+": this.getSeconds(), //秒
-                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-                "S": this.getMilliseconds() //毫秒
-            };
-            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-            for (var k in o)
-                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-            return fmt;
-        }
-
-        var activeBucket = "";
-
-        function connectServer() {
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url: "/cos/entry",
-                data:{
-                    "host":$("#host").val(),
-                    "accessKey":$("#accessKey").val(),
-                    "secretKey":$("#secretKey").val(),
-                    "protocol":$("#protocol").val()
-                },
-//                data:$('#connectForm').serialize(),
-                async: false,
-                error: function(request) {
-                    alert("Connection error:" + request);
-                },
-                success: function(data) {
-                    console.log(data);
-                    // obj.hasOwnProperty("key")
-                    if ("accountOwner" in data) {
-                        var obj = data["accountOwner"];
-                        console.log(obj)
-                    }
-                    getBuckets();
-                }
-            });
-        }
-
-        function getBuckets() {
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: "/cos/buckets",
-                async: false,
-                error: function (request) {
-                    alert("Get bucket error:" + request);
-                },
-                success: function (data) {
-                    var html = "";
-                    for (var i in data) {
-                        if (i == 0) {
-                            activeBucket = data[i]["name"];
-                        }
-                        var bucket = data[i]["name"];
-                        var liId = 'li' + bucket;
-                        html += '<li id="' + liId + '">' + '<a href="javascript:void(0);" onclick=getObjects("' + data[i]["name"] + '")>';
-                        html += data[i]["name"] + '</a></li>';
-                    }
-                    console.log(html);
-                    document.getElementById("bucketList").innerHTML = html;
-                    getObjects(activeBucket);
-                }
-            });
-        }
-
-        function createBucket(bucket) {
-            var urlStr = "/cos/bucket/" + bucket;
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url: urlStr,
-                async: false,
-                error: function (request) {
-                    alert("Create bucket error:" + request);
-                },
-                success: function (data) {
-                    console.log(data);
-                    getBuckets();
-                }
-            });
-        }
-
-        function deleteBucketAction() {
-            console.log("activeBucket:" + activeBucket);
-//            var nodes = document.getElementById("bucketList").childNodes;
-//            for (var i = 0; i < nodes.length; ++i) {
-//                var value = nodes[i].getAttribute("class");
-//                if (value == "active") {
-//                    deleteBucket(nodes[i].id.substr(2));
-//                }
-//            }
-            deleteBucket(activeBucket);
-        }
-
-        function deleteBucket(bucket) {
-            var urlStr = "/cos/bucket/" + bucket;
-            $.ajax({
-                cache: false,
-                type: "DELETE",
-                url: urlStr,
-                async: false,
-                error: function (request) {
-                    alert("Delete bucket error:" + request);
-                },
-                success: function (data) {
-                    console.log(data);
-                    getBuckets();
-                }
-            });
-        }
-
-        function setActiveBucketListItem(bucket) {
-            activeBucket = bucket;
-            var liId = 'li' + bucket;
-            var nodes = document.getElementById("bucketList").childNodes;
-            for (var i = 0; i < nodes.length; ++i) {
-                if (nodes[i].getAttribute("class")) {
-                    nodes[i].setAttribute("class", null);
-                }
-            }
-
-            document.getElementById(liId).setAttribute("class", "active");
-        }
-
-        function getObjects(bucket) {
-            setActiveBucketListItem(bucket);
-            var urlStr = "/cos/bucket/" + bucket + "/objects";
-            $.ajax({
-                cache: false,
-                type: "GET",
-                url: urlStr,
-                async: false,
-                error: function(request) {
-                    alert("Get bucket error:" + request);
-                },
-                success: function(data) {
-//                    console.log(data);
-//                    var b = document.createElement('tbody');
-                    var b = document.getElementById('objectBody');
-                    while (b.hasChildNodes()) {
-                        b.removeChild(b.firstChild);
-                    }
-
-                    for (var i in data) {
-                        var element = data[i];
-                        var r = document.createElement('tr');
-
-                        var c = createFileTd(bucket, element["key"]);
-                        r.appendChild(c);
-
-                        c = createTd(element["size"]);
-                        r.appendChild(c);
-
-                        var fileType = /\.[^\.]+$/.exec(element["key"]);
-                        c = createTd(fileType);
-                        r.appendChild(c);
-
-                        c = createTd(new Date(element["lastModified"]).Format("yyyy-MM-dd hh:mm:ss"));
-                        r.appendChild(c);
-
-                        c = createTd(element["storageClass"]);
-                        r.appendChild(c);
-
-                        b.appendChild(r);
-                    }
-                }
-            });
-        }
-
-        function createFileTd(data1, data2) {
-            var url = "/cos/bucket/" + data1 + "/object/" + data2 + "/";    // 必须加“/”,保证后缀不被截掉
-            var newLink = document.createElement('a');
-            newLink.setAttribute('href', url);
-            var mm = document.createTextNode(data2);
-            newLink.appendChild(mm);
-            // newLink.createTextNode(data2);
-//            console.log(newLink);
-
-            var d = document.createElement('td');
-            d.appendChild(newLink);
-
-//            console.log(d);
-
-            var c = document.createElement('td');
-            var m = document.createTextNode(data2);
-            c.appendChild(newLink);
-            return c;
-        }
-
-        function createTd(data) {
-            var c = document.createElement('td');
-            var m = document.createTextNode(data);
-            c.appendChild(m);
-            return c;
-        }
-
-    </script>
+    <script src="static/js/bootstrap.file-input.js"></script>
+    <script src="static/js/s3browser.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-fixed-top navbar-inverse container-fluid" role="navigation">
@@ -326,7 +121,7 @@
                     <option value="HTTPS">HTTPS</option>
                 </select>
             <!--</div>-->
-            <button onclick="connectServer()">Connect</button>
+            <button class="btn btn-primary btn-sm" onclick="connectServer()">Connect</button>
         </div>
     </div>
 </div>
@@ -334,25 +129,34 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-            <!--<button type="button" class="btn btn-primary btn-sm">-->
-            <!--Bucket List-->
-            <!--</button>-->
-            <span style="font-size: 16px">Bucket List</span>
-            <button type="button" class="btn btn-info btn-sm">
-                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> New</span>
+            <span class="label label-default" style="font-size: 16px">Bucket List</span>
+            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#newBucketModal">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
             </button>
-            <button type="button" class="btn btn-info btn-sm" onclick="deleteBucketAction()">
-                <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"> Del</span>
+            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="bottom" title="delete bucket" onclick="deleteBucketAction()">
+                <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
             </button>
-
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="refresh bucket list" onclick="getBuckets()">
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+            </button>
             <!--<h4 class="sub-header">Bucket List</h4>-->
             <ul class="nav nav-sidebar" id="bucketList">
             </ul>
         </div>
 
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" style="height: 500px">
             <div class="table-responsive">
-                <h4 class="sub-header">Object List</h4>
+                <!--<span style="font-size: 16px">Object List</span>-->
+                <span class="label label-default" style="font-size: 16px">Object List</span>
+                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#newObjectModal">
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-info btn-sm" onclick="deleteObjectAction()">
+                    <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" title="refresh object list">
+                    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                </button>
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -369,10 +173,100 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <ul class="nav nav-tabs" id="myTab">
+            <li role="presentation"><a href="#permTab" data-toggle="tab">Permissions</a></li>
+            <li role="presentation"><a href="#headerTab">Http Headers</a></li>
+            <li role="presentation"><a href="#propsTab">Properties</a></li>
+        </ul>
+    </div>
 </div>
 
+<div class="tab-content" style="margin-left: 10px">
+    <div class="tab-pane" id="permTab">
+        <div class="form-inline" style="margin-left: 8px">
+            <label for="objectUrl">URL:</label>
+            <input type="text" class="form-control" id="objectUrl">
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Full Control</th>
+                <th>Read</th>
+                <th>Write</th>
+                <th>Read Permissions</th>
+                <th>Write Permissions</th>
+            </tr>
+            </thead>
+            <tbody id="permBody">
+            </tbody>
+        </table>
+    </div>
+    <div class="tab-pane" id="headerTab">Just a moment</div>
+    <div class="tab-pane" id="propsTab">Just a moment</div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="newBucketModal" tabindex="-1" role="dialog" aria-labelledby="newBucketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="newBucketModalLabel">Create New Bucket</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newBucketName">Bucket name</label>
+                    <input type="text" class="form-control" id="newBucketName">
+                    <p class="help-block">Should contain only lowercase letters, numbers, periods (.) and dashes (-)</p>
+                </div>
+                <div class="form-group">
+                    <label for="newBucketRegion">Bucket region:</label>
+                    <select class="form-control" id="newBucketRegion">
+                        <option>US Standard</option>
+                        <option>US West (Oregon)</option>
+                        <option>US-West (Northern California)</option>
+                        <option>Europe (Ireland)</option>
+                        <option>Asia Pacific (Singapore)</option>
+                        <option>Asia Pacific (Sydney)</option>
+                        <option>Asia Pacific (Tokyo)</option>
+                        <option>South America (Sao Paulo)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="createBucket()" data-dismiss="modal">Create</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="newObjectModal" tabindex="-1" role="dialog" aria-labelledby="newObjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="newObjectModalLabel">Upload an object</h4>
+            </div>
+            <div class="modal-body">
+                <!--<input type="file" title="Choose a file to upload" class="btn-default">-->
+                <input type="file" data-filename-placement="inside" title="Choose a file to upload">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="static/bootstrap/js/bootstrap.js"></script>
 <!--<script src="http://cdn.bootcss.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>-->
+
 </body>
 </html>
