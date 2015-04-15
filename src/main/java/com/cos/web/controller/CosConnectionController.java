@@ -86,13 +86,13 @@ public class CosConnectionController {
         return cosConnectionService.listObjects(conn, bucketName);
     }
 
-    @RequestMapping(value = "/bucket/{bucketName}/object", method = RequestMethod.POST)
-    public String uploadObjects(HttpSession httpSession, MultipartHttpServletRequest request, @PathVariable(value="bucketName") String bucketName) {
+    @RequestMapping(value = "/bucket/newObject", method = RequestMethod.POST)
+    public String uploadObjects(HttpSession httpSession, MultipartHttpServletRequest request) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        List<MultipartFile> files = request.getFiles("file");
+        List<MultipartFile> files = request.getFiles("file_data");
 //        Subscriber subscriber = (Subscriber)httpSession.getAttribute("subscriber");
 //        String dir = request.getSession().getServletContext().getRealPath("/") + File.separator + "uploads" + File.separator + subscriber.getName();
-
+        String bucketName = request.getParameter("bucket");
         for (MultipartFile multiFile : files) {
             if (!multiFile.isEmpty()) {
                 try {
@@ -105,6 +105,26 @@ public class CosConnectionController {
         }
         return "redirect:objects";
     }
+
+//    @RequestMapping(value = "/bucket/{bucketName}/object", method = RequestMethod.POST)
+//    public String uploadObjects(HttpSession httpSession, MultipartHttpServletRequest request, @PathVariable(value="bucketName") String bucketName) {
+//        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+//        List<MultipartFile> files = request.getFiles("file");
+////        Subscriber subscriber = (Subscriber)httpSession.getAttribute("subscriber");
+////        String dir = request.getSession().getServletContext().getRealPath("/") + File.separator + "uploads" + File.separator + subscriber.getName();
+//
+//        for (MultipartFile multiFile : files) {
+//            if (!multiFile.isEmpty()) {
+//                try {
+//                    String originalFilename = multiFile.getOriginalFilename();
+//                    cosConnectionService.putObject(conn, bucketName, originalFilename, multiFile.getInputStream());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        return "redirect:objects";
+//    }
 
     @RequestMapping("/bucket/{bucketName}/object/{objectName}")
     public void downloadObject(HttpSession httpSession, HttpServletResponse response, HttpServletRequest request, @PathVariable String bucketName, @PathVariable String objectName) throws UnsupportedEncodingException {

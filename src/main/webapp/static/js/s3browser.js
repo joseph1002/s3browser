@@ -218,7 +218,25 @@ $(function () {
         e.preventDefault();
         $(this).tab('show');
     });
+});
 
-    $('input[type=file]').bootstrapFileInput();
-    $('.file-inputs').bootstrapFileInput();
+$("#fileUpload").fileinput({
+    overwriteInitial: false,
+    uploadUrl: "/cos/bucket/newObject",
+    fileType: "any",
+    maxFileSize: 10000,
+    maxFilesNum: 2,
+    //allowedFileTypes: ['image', 'video', 'flash'],
+    slugCallback: function(filename) {
+        console.log(filename);
+        return filename.replace('(', '_').replace(']', '_');
+    },
+    uploadExtraData: function() {
+        var out = {};
+        out["bucket"] = activeBucket;
+        console.log(out);
+        return out;
+    }
+}).on('fileuploaded', function(event, data, previewId, index) {
+    $(this).fileinput('disable');
 });
