@@ -93,14 +93,14 @@ function createBucket() {
 }
 
 function deleteBucketAction() {
-    console.log("activeBucket:" + activeBucket);
-//            var nodes = document.getElementById("bucketList").childNodes;
-//            for (var i = 0; i < nodes.length; ++i) {
-//                var value = nodes[i].getAttribute("class");
-//                if (value == "active") {
-//                    deleteBucket(nodes[i].id.substr(2));
-//                }
-//            }
+    console.log("delete bucket:" + activeBucket);
+    //var nodes = document.getElementById("bucketList").childNodes;
+    //for (var i = 0; i < nodes.length; ++i) {
+    //    var value = nodes[i].getAttribute("class");
+    //    if (value == "active") {
+    //        deleteBucket(nodes[i].id.substr(2));
+    //    }
+    //}
     deleteBucket(activeBucket);
 }
 
@@ -134,9 +134,10 @@ function setActiveBucketListItem(bucket) {
     document.getElementById(liId).setAttribute("class", "active");
 }
 
-function getObjects(bucket) {
-    setActiveBucketListItem(bucket);
-    var urlStr = "/cos/bucket/" + bucket + "/objects";
+function getObjects(bucketName) {
+    console.log("get " + bucketName + "'s objects");
+    setActiveBucketListItem(bucketName);
+    var urlStr = "/cos/bucket/" + bucketName + "/objects";
     $.ajax({
         cache: false,
         type: "GET",
@@ -146,8 +147,6 @@ function getObjects(bucket) {
             alert("Get bucket error:" + request);
         },
         success: function(data) {
-//                    console.log(data);
-//                    var b = document.createElement('tbody');
             var b = document.getElementById('objectBody');
             while (b.hasChildNodes()) {
                 b.removeChild(b.firstChild);
@@ -157,7 +156,7 @@ function getObjects(bucket) {
                 var element = data[i];
                 var r = document.createElement('tr');
 
-                var c = createFileTd(bucket, element["key"]);
+                var c = createFileTd2(element["key"]);
                 r.appendChild(c);
 
                 c = createTd(element["size"]);
@@ -175,27 +174,50 @@ function getObjects(bucket) {
 
                 b.appendChild(r);
             }
+
+            //$("#objectBody :checkbox").change(function() {
+            //    if (this.checked) {
+            //        var url = "http://" + $("#host")[0].value + "/" + bucket + "/" + this.value;
+            //        $("#objectUrl").val(url);
+            //    }
+            //});
+            $("#objectBody :radio").change(function() {
+                //console.log(this);
+                if (this.checked) {
+                    var url = "http://" + $("#host")[0].value + "/" + bucketName + "/" + this.value;
+                    $("#objectUrl").val(url);
+                    getObjectAcl(bucketName, this.value);
+                }
+            });
         }
     });
 }
 
-function createFileTd(data1, data2) {
-    var url = "/cos/bucket/" + data1 + "/object/" + data2 + "/";    // 必须加“/”,保证后缀不被截掉
+function createFileTd(bucketName, objectName) {
+    var url = "/cos/bucket/" + bucketName + "/object/" + objectName + "/";    // 必须加“/”,保证后缀不被截掉
     var newLink = document.createElement('a');
     newLink.setAttribute('href', url);
-    var mm = document.createTextNode(data2);
+    var mm = document.createTextNode(objectName);
     newLink.appendChild(mm);
-    // newLink.createTextNode(data2);
-//            console.log(newLink);
+   //console.log(newLink);
 
     var d = document.createElement('td');
     d.appendChild(newLink);
 
-//            console.log(d);
+    var c = document.createElement('td');
+    c.appendChild(newLink);
+    return c;
+}
+
+function createFileTd2(objectName) {
+    var selectHtml = '<div class="radio" style="margin: 0">\n' +
+        '<label>\n' +
+        '<input type="radio" name="objectRadios" value="'+ objectName + '">' + objectName  +
+        '</label>\n' +
+        '</div>';
 
     var c = document.createElement('td');
-    var m = document.createTextNode(data2);
-    c.appendChild(newLink);
+    c.innerHTML = selectHtml;
     return c;
 }
 
@@ -207,7 +229,54 @@ function createTd(data) {
 }
 
 function deleteObjectAction() {
+    var nodes = $("input[type=radio]:checked");
+    var succ = false;
+    for (var i = 0; i < nodes.length; ++i) {
+        console.log(nodes[i].value);
+        var urlStr = "/cos/bucket/" + activeBucket + "/object/" + nodes[i].value + "/";
+        $.ajax({
+            cache: false,
+            type: "DELETE",
+            url: urlStr,
+            async: false,
+            error: function (request) {
+                alert("Delete object error:" + request);
+            },
+            success: function (data) {
+                console.log(data);
+                succ = true;
+            }
+        });
+    }
+    if (succ) {
+        getObjects(activeBucket);
+    }
+}
 
+function downloadObjectAction() {
+    var nodes = $("input[type=radio]:checked");
+    if (nodes.length > 0) {
+        var urlStr = "/cos/bucket/" + activeBucket + "/object/" + nodes[0].value + "/";
+        //window.location = urlStr;
+        window.open(urlStr, '_blank');
+        console.log(urlStr);
+    }
+}
+
+function getObjectAcl(bucketName, objectName) {
+    var urlStr = "/cos/bucket/" + bucketName + "/object/" + objectName + "/acl";
+    $.ajax({
+        cache: false,
+        type: "GET",
+        url: urlStr,
+        async: false,
+        error: function (request) {
+            alert("get object acl error:" + request);
+        },
+        success: function (data) {
+            console.log(data);
+        }
+    });
 }
 
 $(function () {
@@ -226,9 +295,8 @@ $("#fileUpload").fileinput({
     fileType: "any",
     maxFileSize: 10000,
     maxFilesNum: 2,
-    //allowedFileTypes: ['image', 'video', 'flash'],
     slugCallback: function(filename) {
-        console.log(filename);
+        console.log("slugCallback, filename:" + filename);
         return filename.replace('(', '_').replace(']', '_');
     },
     uploadExtraData: function() {
@@ -238,5 +306,7 @@ $("#fileUpload").fileinput({
         return out;
     }
 }).on('fileuploaded', function(event, data, previewId, index) {
-    $(this).fileinput('disable');
+    console.log("fileuploaded");
+    console.log(data);
+    getObjects(data.response["bucket"]);
 });

@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 @Service
 public class CosConnectionService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CosConnectionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CosConnectionService.class);
 
     public AmazonS3 connect(String host, String accessKey, String secretKey, String protocol) {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
@@ -104,5 +104,9 @@ public class CosConnectionService {
     public void changeObjectAcl(AmazonS3 conn, String bucketName, String objectName, String accessControl) {
         CannedAccessControlList acl = CannedAccessControlList.valueOf(accessControl);
         conn.setObjectAcl(bucketName, objectName, acl);
+    }
+
+    public AccessControlList getObjectAcl(AmazonS3 conn, String bucketName, String objectName) {
+        return conn.getObjectAcl(bucketName, objectName);
     }
 }

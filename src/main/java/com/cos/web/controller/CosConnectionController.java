@@ -48,7 +48,7 @@ public class CosConnectionController {
 
     @RequestMapping(value = "/buckets", method = RequestMethod.GET)
     @ResponseBody
-    public Object listBuckets(HttpSession httpSession, Model model) {
+    public Object listBuckets(HttpSession httpSession) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
 //        List<Bucket> bucketList = cosConnectionService.listBuckets(conn);
 //        model.addAttribute("buckets", bucketList);
@@ -78,7 +78,7 @@ public class CosConnectionController {
 
     @RequestMapping(value = "/bucket/{bucketName}/objects", method = RequestMethod.GET)
     @ResponseBody
-    public Object listObjects(HttpSession httpSession, Model model, @PathVariable(value="bucketName") String bucketName) {
+    public Object listObjects(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
 //        List<S3ObjectSummary> objectSummaryList = cosConnectionService.listObjects(conn, bucketName);
 //        model.addAttribute("objects", objectSummaryList);
@@ -87,23 +87,29 @@ public class CosConnectionController {
     }
 
     @RequestMapping(value = "/bucket/newObject", method = RequestMethod.POST)
-    public String uploadObjects(HttpSession httpSession, MultipartHttpServletRequest request) {
+    @ResponseBody
+    public Object uploadObjects(HttpSession httpSession, MultipartHttpServletRequest request) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
-        List<MultipartFile> files = request.getFiles("file_data");
 //        Subscriber subscriber = (Subscriber)httpSession.getAttribute("subscriber");
 //        String dir = request.getSession().getServletContext().getRealPath("/") + File.separator + "uploads" + File.separator + subscriber.getName();
         String bucketName = request.getParameter("bucket");
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        modelMap.put("bucket", bucketName);
+
+        List<MultipartFile> files = request.getFiles("file_data");
         for (MultipartFile multiFile : files) {
             if (!multiFile.isEmpty()) {
                 try {
                     String originalFilename = multiFile.getOriginalFilename();
                     cosConnectionService.putObject(conn, bucketName, originalFilename, multiFile.getInputStream());
+                    modelMap.put("object", originalFilename);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        return "redirect:objects";
+
+        return modelMap;
     }
 
 //    @RequestMapping(value = "/bucket/{bucketName}/object", method = RequestMethod.POST)
@@ -159,9 +165,29 @@ public class CosConnectionController {
         }
     }
 
+    @RequestMapping(value = "/bucket/{bucketName}/object/{objectName}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public Object removeObject(HttpSession httpSession, @PathVariable(value="bucketName") String bucketName, @PathVariable(value="objectName") String objectName) {
+        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        conn.deleteObject(bucketName, objectName);
+
+        Map<String, Object> modelMap = new HashMap<String, Object>();
+        modelMap.put("bucket", bucketName);
+        modelMap.put("deletedObject", objectName);
+
+        return modelMap;
+    }
+
     @RequestMapping(value = "/bucket/{bucketName}/object/{objectName}/acl/{accessControl}", method = RequestMethod.PUT)
     public void changeObjectAcl(HttpSession httpSession, @PathVariable String bucketName, @PathVariable String objectName, @PathVariable String accessControl) {
         AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
         cosConnectionService.changeObjectAcl(conn, bucketName, objectName, accessControl);
+    }
+
+    @RequestMapping(value = "/bucket/{bucketName}/object/{objectName}/acl", method = RequestMethod.GET)
+    @ResponseBody
+    public Object getObjectAcl(HttpSession httpSession, @PathVariable String bucketName, @PathVariable String objectName) {
+        AmazonS3 conn = (AmazonS3)httpSession.getAttribute("connection");
+        return cosConnectionService.getObjectAcl(conn, bucketName, objectName);
     }
 }
