@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <springframework.version>4.1.5.RELEASE</springframework.version>
+        <springframework.version>5.1.8.RELEASE</springframework.version>
         <jackson.version>2.5.2</jackson.version>
         <amazonaws.version>1.8.11</amazonaws.version>
         <project.build.finalName>s3browser</project.build.finalName>
